@@ -1,5 +1,8 @@
+
+
+
 function setup(){
-    
+   
 }
 function draw() {
     // display and background settings! 
@@ -20,5 +23,31 @@ function draw() {
             border.checkPolygonEdges(currentGap);
         }
     }
+
+}
+
+
+
+function startSimulation(){
+
+}
+
+
+function stopSimulation(){
+
+}
+
+
+function clickObjects(){
+    // implement the clicking of objects here.
+}
+
+
+function recordSimulation(){
+    
+}
+
+
+function applyChanges(){
 
 }

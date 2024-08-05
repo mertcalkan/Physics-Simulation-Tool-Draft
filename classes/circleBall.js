@@ -1,5 +1,6 @@
 class circleBall {
-  constructor(xPos, yPos, radius, xSpeed, ySpeed, fillColor, incMode , decMode , strokeColor, gravityActive, strokeWeightValue, collideOtherCircles, particleBorderCollide, particleBallCollide,playSound , addLinesAfterCollision , maskable) {
+  constructor(uName,xPos, yPos, radius, xSpeed, ySpeed, fillColor, incMode , decMode , strokeColor, gravityActive, strokeWeightValue, collideOtherCircles, particleBorderCollide, particleBallCollide,playSound , addLinesAfterCollision , maskable) {
+    this.name = uName
     this.position = createVector(xPos, yPos);
     this.velocity = createVector(xSpeed, ySpeed);
     this.radius = radius;

@@ -1,5 +1,5 @@
 class StarBall {
-  constructor(xPos, yPos, radius, xSpeed, ySpeed, points, inset, gravity, spinnable , type , subType) {
+  constructor(xPos, yPos, radius, xSpeed, ySpeed, points, inset, gravity, spinnable , type , subType , incMode , decMode) {
     this.position = createVector(xPos, yPos);
     this.velocity = createVector(xSpeed, ySpeed);
     this.radius = radius;
@@ -9,6 +9,8 @@ class StarBall {
     this.spinnable = spinnable
     this.type = type
     this.subType = subType
+    this.incMode = incMode
+    this.decMode = decMode
   }
 
   applyGravity() {
@@ -62,8 +64,32 @@ class StarBall {
     }
   }
 
-  checkCollisionWithCircularPlatform() {
+  checkCollisionWithCircularPlatform(centerX, centerY, circleRadius, isInGap) {
+    let distanceToCenter = dist(this.position.x, this.position.y, centerX, centerY);
+    let angle = atan2(this.position.y - centerY, this.position.x - centerX);
 
+    if (distanceToCenter >= circleRadius - this.radius) {
+      if (!isInGap(angle)) {
+        let collisionX = centerX + cos(angle) * (circleRadius - this.radius);
+        let collisionY = centerY + sin(angle) * (circleRadius - this.radius);
+
+        this.position.set(collisionX, collisionY);
+
+        let normal = createVector(this.position.x - centerX, this.position.y - centerY).normalize();
+        let velocity = this.velocity.copy();
+        let dotProduct = velocity.dot(normal);
+        let reflection = p5.Vector.mult(normal, -2 * dotProduct).add(velocity);
+
+        this.velocity.set(reflection.x * 0.98, reflection.y * 0.96);
+
+        if (this.playSound) {
+          soundArr[counterIndex % soundCount].play();
+        }
+        if (this.particleBorderCollide) {
+          createParticles(this.position.x, this.position.y);
+        }
+      }
+    }
   }
 
   display() {

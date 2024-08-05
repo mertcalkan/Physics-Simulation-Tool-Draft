@@ -1,5 +1,6 @@
 class circularBorder {
-    constructor(x, y, type, subType, radius, startAngle, endAngle, rotationSpeed, fillable, strokeable, constantColorMode, fillColor, strokeColor,maskable) {
+    constructor(uName , x, y, type, subType, radius, startAngle, endAngle, rotationSpeed, fillable, strokeable, constantColorMode, fillColor, strokeColor,maskable) {
+        this.name = uName
         this.x = x;
         this.y = y;
         this.radius = radius;

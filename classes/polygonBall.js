@@ -7,42 +7,22 @@ class PolygonBall {
         xSpeed,
         ySpeed,
         gravity,
-        spinnable,
-        decMode,
-        incMode,
-        changeColor,
-        changeSize,
+        collisionOptions,
         fillColor,
         trailMode,
-        addLinesAfterCollision,
-        addAnotherBall,
-        changeBorderRadius,
-        changeBorderType,
-        changeBorderSpinningVelocity,
-        changeBorderGap
+        escapeOptions,
     }) {    
         this.position = createVector(xPos, yPos);
         this.radius = radius;
         this.sides = sides;
         this.velocity = createVector(xSpeed, ySpeed);
         this.gravity = gravity;
-        this.spinnable = spinnable;
-        this.decMode = decMode;
-        this.incMode = incMode;
-        this.changeColor = changeColor;
-        this.changeSize = changeSize;
         this.fillColor = fillColor;
         this.trailMode = trailMode;
         this.trail = trailMode ? [] : null;
-        this.addLinesAfterCollision = addLinesAfterCollision;
         this.fixedColor = fixedColor
-        this.addAnotherBall = addAnotherBall 
-        this.changeBorderRadius = changeBorderRadius
-        this.changeBorderType = changeBorderType
-        this.changeBorderSpinningVelocity = changeBorderSpinningVelocity
-        this.changeBorderGap = changeBorderGap
-        this.madeChangesAfterEscapeMaze = madeChangesAfterEscapeMaze
-    
+        this.collisionOptions = collisionOptions
+        this.escapeOptions = borders.some(item => item.type == "Maze") ? escapeOptions : null    
     }
 
     update() {
@@ -53,19 +33,22 @@ class PolygonBall {
     }
 
     handleCollision() {
-        let distanceToCenter = dist(this.position.x, this.position.y, centerX, centerY);
-        if (distanceToCenter >= circleRadius - this.radius) {
-            let angle = atan2(this.position.y - centerY, this.position.x - centerX);
-            if (!isInGap(angle)) {
-                this.adjustPosition(angle);
-                this.bounceBack();
-                this.updateSides();
-                if (this.trailMode) particleSystem.createBigCircleParticles(centerX, centerY, circleRadius, 360);
-                this.applyEffects();
-            } else {
-                particleSystem.createParticles(this.position.x, this.position.y);
-            }
+        for(let i = 0 ; i < circleBorders.length; i++){
+            let distanceToCenter = dist(this.position.x, this.position.y, centerX, centerY);
+            if (distanceToCenter >= circleBorders[i].radius - this.radius) {
+                let angle = atan2(this.position.y - centerY, this.position.x - centerX);
+                if (!isInGap(angle)) {
+                    this.adjustPosition(angle);
+                    this.bounceBack();
+                    this.updateSides();
+                    if (this.trailMode) particleSystem.createBigCircleParticles(centerX, centerY, circleBorders[i].radius, 360);
+                    this.applyEffects();
+                }
+                else {
+                    particleSystem.createParticles(this.position.x, this.position.y);
+                }
         }
+    }
     }
 
     adjustPosition(angle) {
@@ -110,10 +93,23 @@ class PolygonBall {
         
     }
 
-    changeBorderProperties(){
-        if(this.changeBorderRadius){
-            circle
+    removeBall(ballType){
+        if(this.removeBall){
+            if(ballType == "random"){
+
+            }
+            else if(ballType = "circle"){
+    
+            }
+            else if(ballType == "polygon"){
+    
+            }
         }
+        
+    }
+
+    changeBorderProperties(borderIndex){
+    
     }
     recordTrail() {
         if (this.trail.length >= trailLength) this.trail.shift();
@@ -143,6 +139,12 @@ class PolygonBall {
         }
         
         endShape(CLOSE);
+    }
+
+    playSound(){
+        if(this.playSound){
+            //implementing playing Sound Effect.
+        }
     }
 
     drawTrail() {
