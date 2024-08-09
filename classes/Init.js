@@ -1,10 +1,17 @@
 
-
-
+let bgColor = ""
+let ballTypes = ["polygon", "circle" , "star"]
+let borderTypes = ["polygon" , "circle" ]
+let trigFunctions = ["sin" , "cos", "tan"  , "cot" , "arcsin", "arccos", "arctan", "arccot" , "arccos", "arcsec" ]
+let borders = []
+let objects = []
+let balls 
+let circleBalls
 function setup(){
    
 }
 function draw() {
+    background(bgColor)
     // display and background settings! 
     // user can set up their image to fit in to canvas.
     // scale things before display and when we will record , the sketch will be display as original rate(1)
@@ -51,3 +58,60 @@ function recordSimulation(){
 function applyChanges(){
 
 }
+
+
+function checkNameDifferences(new_uName, allObj) {
+    for (let obj of allObj) {
+        if (obj.uName === new_uName) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function radiusDifferencesBetweenSameBorders(newRadius,){
+    for (let obj of allObj) {
+        if (obj.uName === new_uName) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+function objectExists(objType , allObj){
+    for (let obj of allObj) {
+        if (obj.type === new_uName) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+function deleteSimulation(){
+
+}
+
+function saveSimulation(key,objArr){
+    const jsonString = JSON.stringify(objArr);
+    localStorage.setItem(key, jsonString);
+}
+
+function openSavedSimulation(key){
+    const jsonString = localStorage.getItem(key);
+    return JSON.parse(jsonString);
+}
+
+
+function detectObject(){
+    
+}
+
+
+function selectRandomFromArray(number , arr){
+
+}
+
+
+function

@@ -23,7 +23,7 @@ class circularBorder {
         if (!this.strokeable) {
             noStroke();
         } else {
-            if (constantColorMode) {
+            if (this.constantColorMode) {
                 stroke(this.strokeColor)
             } else {
                 let currentTime = millis();
@@ -59,23 +59,4 @@ class circularBorder {
 
     }
 
-    checkCollision(ball) {
-        let distanceToCenter = dist(ball.x, ball.y, this.x, this.y);
-        if (distanceToCenter > this.radius + ball.radius) {
-            ball.handleEscape(this.index);
-        } else {
-            let angle = atan2(ball.y - this.y, ball.x - this.x);
-            angle = degrees(angle);
-            if (angle < 0) angle += 360;
-            let effectiveStartAngle = (this.startAngle + this.rotationAngle) % 360;
-            let effectiveEndAngle = (this.endAngle + this.rotationAngle) % 360;
-            let isWithinArc = (effectiveStartAngle < effectiveEndAngle) ?
-                (angle >= effectiveStartAngle && angle <= effectiveEndAngle) :
-                (angle >= effectiveStartAngle || angle <= effectiveEndAngle);
-
-            if (distanceToCenter >= this.radius - ball.radius && isWithinArc) {
-                ball.handleCollision(this.index);
-            }
-        }
-    }
 }
