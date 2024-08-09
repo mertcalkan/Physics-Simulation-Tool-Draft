@@ -79,14 +79,7 @@ function radiusDifferencesBetweenSameBorders(newRadius,){
 }
 
 
-function objectExists(objType , allObj){
-    for (let obj of allObj) {
-        if (obj.type === new_uName) {
-            return false;
-        }
-    }
-    return true;
-}
+
 
 
 function deleteSimulation(){
@@ -114,4 +107,11 @@ function selectRandomFromArray(number , arr){
 }
 
 
-function
+function objectExists(objType , objSubType , allObj){
+    for (let obj of allObj) {
+        if (obj.type == objType && obj.subType == objSubType) {
+            return true
+        }
+    }
+    return false;
+}
