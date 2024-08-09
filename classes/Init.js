@@ -1,15 +1,17 @@
-
 let bgColor = ""
-let ballTypes = ["polygon", "circle" , "star"]
-let borderTypes = ["polygon" , "circle" ]
-let trigFunctions = ["sin" , "cos", "tan"  , "cot" , "arcsin", "arccos", "arctan", "arccot" , "arccos", "arcsec" ]
+let objectTypes = ["ball","border"]
+let ballTypes = ["polygon", "circle", "star"]
+let borderTypes = ["polygon", "circle"]
+let trigFunctions = ["sin", "cos", "tan", "cot", "arcsin", "arccos", "arctan", "arccot", "arccos", "arcsec"]
 let borders = []
 let objects = []
-let balls 
+let balls
 let circleBalls
-function setup(){
-   
+
+function setup() {
+
 }
+
 function draw() {
     background(bgColor)
     // display and background settings! 
@@ -30,32 +32,33 @@ function draw() {
             border.checkPolygonEdges(currentGap);
         }
     }
+    checkCollisionWithOtherBalls()
 
 }
 
 
 
-function startSimulation(){
+function startSimulation() {
 
 }
 
 
-function stopSimulation(){
+function stopSimulation() {
 
 }
 
 
-function clickObjects(){
+function clickObjects() {
     // implement the clicking of objects here.
 }
 
 
-function recordSimulation(){
-    
+function recordSimulation() {
+
 }
 
 
-function applyChanges(){
+function applyChanges() {
 
 }
 
@@ -69,7 +72,7 @@ function checkNameDifferences(new_uName, allObj) {
     return true;
 }
 
-function radiusDifferencesBetweenSameBorders(newRadius,){
+function radiusDifferencesBetweenSameBorders(newRadius, ) {
     for (let obj of allObj) {
         if (obj.uName === new_uName) {
             return false;
@@ -82,36 +85,77 @@ function radiusDifferencesBetweenSameBorders(newRadius,){
 
 
 
-function deleteSimulation(){
+function deleteSimulation() {
 
 }
 
-function saveSimulation(key,objArr){
+function saveSimulation(key, objArr) {
     const jsonString = JSON.stringify(objArr);
     localStorage.setItem(key, jsonString);
 }
 
-function openSavedSimulation(key){
+function openSavedSimulation(key) {
     const jsonString = localStorage.getItem(key);
     return JSON.parse(jsonString);
 }
 
 
-function detectObject(){
-    
-}
-
-
-function selectRandomFromArray(number , arr){
+function detectObject() {
 
 }
 
 
-function objectExists(objType , objSubType , allObj){
+function selectRandomFromArray(number, arr) {
+
+}
+
+
+function objectExists(objType, objSubType, allObj) {
     for (let obj of allObj) {
         if (obj.type == objType && obj.subType == objSubType) {
             return true
         }
     }
     return false;
+}
+
+function checkCollisionWithOtherBalls() {
+    const allBalls = objects.filter(obj => obj.type === "Ball");
+    if (allBalls.length > 1) {
+        for (let i = 0; i < allBalls.length; i++) {
+            for (let j = i + 1; j < allBalls.length; j++) {
+                if (allBalls[i].collideable && allBalls[j].collideable) {
+                    if (allBalls[i].subType == "Circle" && allBalls[j].subType == "Circle") {
+                        let d = dist(allBalls[i].xPos, allBalls[i].yPos, allBalls[j].xPos, allBalls[j].yPos);
+                        if (d <= ballRadius * 2) {
+                            let angle = atan2(
+                                allBalls[i].yPos - allBalls[j].yPos,
+                                allBalls[i].xPos - allBalls[j].xPos
+                            );
+                            let overlap = ballRadius * 2 - d;
+                            let dx = overlap * cos(angle);
+                            let dy = overlap * sin(angle);
+                            allBalls[i].xPos += dx / 2;
+                            allBalls[i].yPos += dy / 2;
+                            allBalls[j].xPos -= dx / 2;
+                            allBalls[j].yPos -= dy / 2;
+                            let tempXSpeed = xSpeedArr[i];
+                            let tempYSpeed = ySpeedArr[i];
+                            xSpeedArr[i] = xSpeedArr[j];
+                            ySpeedArr[i] = ySpeedArr[j];
+                            xSpeedArr[j] = tempXSpeed;
+                            ySpeedArr[j] = tempYSpeed;
+                            strokeArr[i] -= 0.2;
+                            strokeArr[j] -= 0.2;
+                        }
+                    } else if (allBalls[i].subType == "Star" && allBalls[j].subType == "Star") {
+                        // will implement logic.
+                    } else if (allBalls[i].subType == "Polygon" && allBalls[j].subType == "Polygon") {
+                        // will implement logic.
+                    }
+                }
+            }
+        }
+    }
+
 }

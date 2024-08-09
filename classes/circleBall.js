@@ -130,7 +130,6 @@ class CircleBall {
               }
               break;
             case "color":
-              
               const color = ref.color === "random" ? random(polygonBallColors) : ref.color;
               if (polygon.color === color) {
                 polygon.sides = max(3, this.sides + prop.addPolygonSizes.incrementValue);
@@ -152,7 +151,9 @@ class CircleBall {
         });
       }
       
-
+      else if (prop.addBorder.active){
+        
+      }
       // changing ball type 
       else if (prop.changeBallType?.active && totalBounces % prop.changeBallType.countParam === 0) {
         let newBall;
@@ -168,9 +169,22 @@ class CircleBall {
           }
         }
       }
-
-      else if (prop.addBall?.active && totalBounces % prop.addBall.countParam === 0) {
-        // Add ball logic
+      // add new ball
+      else if (prop.addBall?.active && totalBounces % prop.addBall.countParam === 0) { 
+        for(let i = 0 ; i < prop.addBalls.ballCount; i++){
+          let ballType = prop.addBall.type;
+          if (ballType === "Random") {
+            ballType = random(ballTypes);
+          }
+          switch (ballType) {
+            case "Star":
+              objects.push(new StarBall(params));
+              break;
+            case "Polygon":
+              objects.push(new PolygonBall(params));
+              break;
+          }
+        }
       }
       // remove balls with references.
      else if (prop.removeBall?.active && totalBounces % prop.removeBall.countParam === 0) {
