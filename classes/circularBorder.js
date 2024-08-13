@@ -1,22 +1,14 @@
-class circularBorder {
-    constructor(uName , x, y, type, subType, radius, startAngle, endAngle, rotationSpeed, fillable, strokeable, constantColorMode, fillColor, strokeColor,maskable) {
-        this.name = uName
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.type = type;
-        this.subType = subType
-        this.startAngle = (this.type == "Border") ? 0 : startAngle;
-        this.endAngle = (this.type == "Border") ? 360 : endAngle;
-        this.rotationAngle = (this.type == "Border") ? 360 : rotationAngle;
-        this.rotationSpeed = (this.type == "Border") ? 360 : rotationSpeed;
-        this.fillable = fillable
-        this.strokeable = strokeable
-        this.constantColorMode = constantColorMode;
-        this.fillColor = fillColor;
-        this.strokeColor = strokeColor;
-        this.maskeable = (this.type == "Border") && numOfCircularBorders < 2 ? maskable : false;
-
+class CircularBorder {
+    constructor(params) {
+        Object.assign(this, params);
+        this.position = createVector(params.xPos, params.yPos);
+        this.velocity = params.moveable ? createVector(params.xSpeed, params.ySpeed) : createVector(0,0)
+        this.collideWithOtherBalls = ballNumber > 1 && params.collideWithOtherBalls;
+        this.subType =  (params.startAngle == 0 && params.endAngle == 360) ? "Border" : params.subType;
+        this.startAngle = params.subType == "Border" ? 0 : params.startAngle
+        this.endAngle = params.subType == "Border" ? 360 : params.endAngle
+        this.spinAroundItself = params.subType == "Maze" ? true : false
+        this.spinAroundOtherself = params.spinAroundOtherself
     }
 
     display() {
@@ -49,12 +41,12 @@ class circularBorder {
         }
         push();
         translate(this.x, this.y);
-        rotate(radians(this.rotationAngle));
+        if(this.spinAroundOtherself){
+            rotate(radians(this.rotationAngle));
+        }
         arc(0, 0, this.radius * 2, this.radius * 2, radians(this.startAngle), radians(this.endAngle));
         pop();
-        if (this.type == "Maze") {
-            this.rotationAngle += this.rotationSpeed / 10;
-        }
+
 
 
     }

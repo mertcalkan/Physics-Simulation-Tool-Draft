@@ -1,177 +1,216 @@
 class PolygonBall {
-    constructor({
-        xPos,
-        yPos,
-        radius,
-        sides,
-        xSpeed,
-        ySpeed,
-        gravity,
-        collisionOptions,
-        fillColor,
-        trailMode,
-        escapeOptions,
-    }) {    
-        this.position = createVector(xPos, yPos);
-        this.radius = radius;
-        this.sides = sides;
-        this.velocity = createVector(xSpeed, ySpeed);
-        this.gravity = gravity;
-        this.fillColor = fillColor;
-        this.trailMode = trailMode;
-        this.trail = trailMode ? [] : null;
-        this.fixedColor = fixedColor
-        this.collisionOptions = collisionOptions
-        this.escapeOptions = borders.some(item => item.type == "Maze") ? escapeOptions : null    
+    constructor(params) {
+      this.position = createVector(params.xPos, params.yPos);
+      this.velocity = createVector(params.xSpeed, params.ySpeed);
+      this.trail = this.trailMode ? [] : null;
     }
-
+  
     update() {
-        this.position.add(this.velocity);
-        this.velocity.y += this.gravity;
-        this.handleCollision();
-        if (this.trailMode) this.recordTrail();
+      this.applyMovement();
+      this.handleCollision();
+      if (this.trailMode) this.recordTrail();
     }
-
-    handleCollision() {
-        for(let i = 0 ; i < circleBorders.length; i++){
-            let distanceToCenter = dist(this.position.x, this.position.y, centerX, centerY);
-            if (distanceToCenter >= circleBorders[i].radius - this.radius) {
-                let angle = atan2(this.position.y - centerY, this.position.x - centerX);
-                if (!isInGap(angle)) {
-                    this.adjustPosition(angle);
-                    this.bounceBack();
-                    this.updateSides();
-                    if (this.trailMode) particleSystem.createBigCircleParticles(centerX, centerY, circleBorders[i].radius, 360);
-                    this.applyEffects();
-                }
-                else {
-                    particleSystem.createParticles(this.position.x, this.position.y);
-                }
-        }
+  
+    applyMovement() {
+      this.position.add(this.velocity);
+      this.velocity.y += this.gravity;
     }
-    }
-
-    adjustPosition(angle) {
-        this.position.x = centerX + cos(angle) * (circleRadius - this.radius);
-        this.position.y = centerY + sin(angle) * (circleRadius - this.radius);
-    }
-
-    bounceBack() {
-        let normal = createVector(this.position.x - centerX, this.position.y - centerY).normalize();
-        let dotProduct = this.velocity.dot(normal);
-        this.velocity.sub(p5.Vector.mult(normal, 1.98 * dotProduct));
-    }
-
-    updateSides() {
-        if (this.decMode) {
-            this.sides = max(3, this.sides - 1);
-        } else if (this.incMode) {
-            this.sides = max(3, this.sides + 1);
-        }
-    }
-
-    applyEffects() {
-        if (this.changeColor) {
-            this.fillColor = random(colors);
-        }
-        if (this.addLinesAfterCollision) {
-            // Implement line addition logic if needed
-        }
-    }
-    addAnotherBall(ballType){
-        if(this.addAnotherBall){
-            if(ballType == "random"){
-
-            }
-            else if(ballType = "circle"){
+    checkLinearCollision(polygonBorder) {
+        const ballVertices = this.getVertices();
+        const frameVertices = polygonBorder.getVertices();
     
-            }
-            else if(ballType == "polygon"){
+        // Poligon topun her bir kenarını, çerçevenin her bir kenarı ile karşılaştır
+        for (let i = 0; i < ballVertices.length; i++) {
+          let ballStart = ballVertices[i];
+          let ballEnd = ballVertices[(i + 1) % ballVertices.length];
     
+          for (let j = 0; j < frameVertices.length; j++) {
+            let frameStart = frameVertices[j];
+            let frameEnd = frameVertices[(j + 1) % frameVertices.length];
+    
+            // Kenarların kesişip kesişmediğini kontrol et
+            if (this.doLineSegmentsIntersect(ballStart, ballEnd, frameStart, frameEnd)) {
+              // Çarpışma normali
+              let collisionNormal = p5.Vector.sub(frameEnd, frameStart).rotate(HALF_PI).normalize();
+    
+              // Topu çerçeve dışına geri yolla
+              this.separateFromFrame(collisionNormal);
+    
+              // Çarpışma sonrası hız değişimi
+              this.bounceBack(collisionNormal);
+    
+              // İsteğe bağlı efektler (renk değişimi, ses efekti, vb.)
+              this.applyEffects();
+    
+              return; // Çarpışma tespit edildiğinde erken çıkış yap
             }
+          }
         }
-        
-    }
-
-    removeBall(ballType){
-        if(this.removeBall){
-            if(ballType == "random"){
-
-            }
-            else if(ballType = "circle"){
-    
-            }
-            else if(ballType == "polygon"){
-    
-            }
+      }
+    checkCircularCollision() {
+        const distanceToCenter = dist(this.position.x, this.position.y, centerX, centerY);
+        if (distanceToCenter >= border.radius - this.radius) {
+          const angle = atan2(this.position.y - centerY, this.position.x - centerX);
+          if (!this.isInGap(angle)) {   
+            this.adjustPosition(angle, border.radius);
+            this.bounceBack();
+            this.updateSides();
+            this.applyEffects();
+          } else {
+            particleSystem.createParticles(this.position.x, this.position.y);
+          }
         }
-        
+      
     }
 
-    changeBorderProperties(borderIndex){
-    
-    }
-    recordTrail() {
-        if (this.trail.length >= trailLength) this.trail.shift();
-        this.trail.push({ x: this.position.x, y: this.position.y });
-    }
+    isInGap(angle) {
+        for (let gap of this.gapAngles) {
+          if (angle >= gap.startAngle && angle <= gap.endAngle) {
+            return true;
+          }
+        }
+        return false;
+      }
 
-    display() {
-        strokeWeight(5.7);
-        stroke("white");
-        this.drawPolygon();
-        if (this.trailMode) this.drawTrail();
-    }
-
-    drawPolygon() {
-        let angle = TWO_PI / this.sides;
-        beginShape();
+      getVertices() {
+        let vertices = [];
+        const angle = TWO_PI / this.sides;
         for (let a = 0; a < TWO_PI; a += angle) {
-            let sx = this.position.x + cos(a) * this.radius;
-            let sy = this.position.y + sin(a) * this.radius;
-            vertex(sx, sy);
+          const vx = this.position.x + cos(a) * this.radius;
+          const vy = this.position.y + sin(a) * this.radius;
+          vertices.push(createVector(vx, vy));
         }
-        if(this.fixedColor){
-            fill(this.fillColor);
+        return vertices;
+      }
+    
+      doLineSegmentsIntersect(p1, p2, p3, p4) {
+        const d1 = this.direction(p3, p4, p1);
+        const d2 = this.direction(p3, p4, p2);
+        const d3 = this.direction(p1, p2, p3);
+        const d4 = this.direction(p1, p2, p4);
+    
+        if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
+            ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) {
+          return true;
         }
-        else{
-            // fill with r,g,b with millis() paramteers and sin & cos functionalities.
-        }
-        
-        endShape(CLOSE);
+    
+        if (d1 === 0 && this.onSegment(p3, p4, p1)) return true;
+        if (d2 === 0 && this.onSegment(p3, p4, p2)) return true;
+        if (d3 === 0 && this.onSegment(p1, p2, p3)) return true;
+        if (d4 === 0 && this.onSegment(p1, p2, p4)) return true;
+    
+        return false;
+      }
+    
+      direction(p1, p2, p3) {
+        return (p3.x - p1.x) * (p2.y - p1.y) - (p3.y - p1.y) * (p2.x - p1.x);
+      }
+    
+      onSegment(p1, p2, p) {
+        return (min(p1.x, p2.x) <= p.x && p.x <= max(p1.x, p2.x)) &&
+               (min(p1.y, p2.y) <= p.y && p.y <= max(p1.y, p2.y));
+      }
+    
+      separateFromFrame(collisionNormal) {
+        // Topu çerçeveden ayırmak için pozisyonunu değiştir
+        let penetrationDepth = this.radius;
+        let separationVector = p5.Vector.mult(collisionNormal, penetrationDepth);
+        this.position.add(separationVector);
+      }
+    
+      bounceBack(collisionNormal) {
+        // Hız vektörünü çarpışma normali boyunca yansıt
+        let dotProduct = this.velocity.dot(collisionNormal);
+        this.velocity.sub(p5.Vector.mult(collisionNormal, 2 * dotProduct));
+      }
+  
+    adjustPosition(angle, borderRadius) {
+      this.position.set(
+        centerX + cos(angle) * (borderRadius - this.radius),
+        centerY + sin(angle) * (borderRadius - this.radius)
+      );
     }
-
-    playSound(){
-        if(this.playSound){
-            //implementing playing Sound Effect.
-        }
+  
+    bounceBack() {
+      const normal = createVector(this.position.x - centerX, this.position.y - centerY).normalize();
+      const dotProduct = this.velocity.dot(normal);
+      this.velocity.sub(p5.Vector.mult(normal, 1.98 * dotProduct));
     }
-
+  
+    updateSides() {
+      if (this.effects.decMode) this.sides = max(3, this.sides - 1);
+      if (this.effects.incMode) this.sides = max(3, this.sides + 1);
+    }
+  
+    applyEffects() {
+      if (this.effects.changeColor) this.fillColor = random(colors);
+      if (this.effects.playSound) this.playSound();
+      if (this.effects.addLinesAfterCollision) this.addLines();
+    }
+  
+    recordTrail() {
+      if (this.trail.length >= trailLength) this.trail.shift();
+      this.trail.push({ x: this.position.x, y: this.position.y });
+    }
+  
+    display() {
+      this.drawPolygon();
+      if (this.trailMode) this.drawTrail();
+    }
+  
+    drawPolygon() {
+      const angle = TWO_PI / this.sides;
+      beginShape();
+      for (let a = 0; a < TWO_PI; a += angle) {
+        const sx = this.position.x + cos(a) * this.radius;
+        const sy = this.position.y + sin(a) * this.radius;
+        vertex(sx, sy);
+      }
+      this.applyFillColor();
+      endShape(CLOSE);
+    }
+  
+    applyFillColor() {
+      if (this.fixedColor) {
+        fill(this.fillColor);
+      } else {
+        const dynamicColor = color(
+          map(sin(millis() * 0.001), -1, 1, 0, 255),
+          map(cos(millis() * 0.001), -1, 1, 0, 255),
+          map(sin(millis() * 0.002), -1, 1, 0, 255)
+        );
+        fill(dynamicColor);
+      }
+    }
+  
+    playSound() {
+      // Implement sound effect logic here
+    }
+  
+    addLines() {
+      // Implement line addition logic if needed
+    }
+  
     drawTrail() {
-        for (let i = 0; i < this.trail.length - 1; i++) {
-            let alpha = map(i, 0, this.trail.length - 1, 255, 0);
-            stroke(trailColor);
-            strokeWeight(20);
-            line(this.trail[i].x, this.trail[i].y, this.trail[i + 1].x, this.trail[i + 1].y);
-        }
+      for (let i = 0; i < this.trail.length - 1; i++) {
+        const alpha = map(i, 0, this.trail.length - 1, 255, 0);
+        stroke(trailColor);
+        strokeWeight(20);
+        line(this.trail[i].x, this.trail[i].y, this.trail[i + 1].x, this.trail[i + 1].y);
+      }
     }
-}
-
-// Usage Example
-let polygonBall = new PolygonBall({
-    xPos: centerX,
-    yPos: centerY - circleRadius + polygonRadius,
-    radius: polygonRadius,
-    sides: polygonSides,
-    xSpeed: -1.3,
-    ySpeed: 0.545,
-    gravity: 0.75,
-    spinnable: true,
-    decMode: true,
-    incMode: false,
-    changeColor: true,
-    changeSize: false,
-    fillColor: 'red',
-    trailMode: true,
-    addLinesAfterCollision: false
-});
+  
+    addOrRemoveBall(action, ballType) {
+      if (action === "add") {
+        // Implement adding ball logic here
+      } else if (action === "remove") {
+        // Implement removing ball logic here
+      }
+    }
+  
+      changeBorderProperties(borderIndex) {
+        // Implement logic to change border properties if needed
+      }
+  }
+  
+ 
