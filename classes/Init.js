@@ -48,29 +48,19 @@ function draw() {
 
 
 
-function startSimulation() {
-
-}
 
 
-function stopSimulation() {
-
-}
 
 
-function clickObjects() {
-    // implement the clicking of objects here.
-}
 
 
-function recordSimulation() {
-
-}
 
 
-function applyChanges() {
 
-}
+
+
+
+
 
 
 function checkNameDifferences(new_uName, allObj) {
