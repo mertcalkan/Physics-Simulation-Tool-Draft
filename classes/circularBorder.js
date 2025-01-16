@@ -3,14 +3,12 @@ class CircularBorder {
         Object.assign(this, params);
         this.position = createVector(params.xPos, params.yPos);
         this.velocity = params.moveable ? createVector(params.xSpeed, params.ySpeed) : createVector(0,0)
-        this.collideWithOtherBalls = ballNumber > 1 && params.collideWithOtherBalls;
         this.subType =  (params.startAngle == 0 && params.endAngle == 360) ? "Border" : params.subType;
         this.startAngle = params.subType == "Border" ? 0 : params.startAngle
         this.endAngle = params.subType == "Border" ? 360 : params.endAngle
         this.spinAroundItself = params.subType == "Border" ?  false : params.spinAroundItself
         this.spinAroundOtherself = params.spinAroundOtherself
     }
-
     display() {
         if (!this.strokeable) {
             noStroke();
@@ -46,9 +44,6 @@ class CircularBorder {
         }
         arc(0, 0, this.radius * 2, this.radius * 2, radians(this.startAngle), radians(this.endAngle));
         pop();
-        
-
-
     }
 
 }

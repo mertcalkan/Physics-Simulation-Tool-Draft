@@ -27,22 +27,17 @@ class PolygonBall {
           for (let j = 0; j < frameVertices.length; j++) {
             let frameStart = frameVertices[j];
             let frameEnd = frameVertices[(j + 1) % frameVertices.length];
-    
             // Kenarların kesişip kesişmediğini kontrol et
             if (this.doLineSegmentsIntersect(ballStart, ballEnd, frameStart, frameEnd)) {
-              // Çarpışma normali
+              // getting the normal of the collision
               let collisionNormal = p5.Vector.sub(frameEnd, frameStart).rotate(HALF_PI).normalize();
-    
-              // Topu çerçeve dışına geri yolla
-              this.separateFromFrame(collisionNormal);
-    
-              // Çarpışma sonrası hız değişimi
+              this.separateFromFrame(collisionNormal)
+              // velocity change after collision
               this.bounceBack(collisionNormal);
     
-              // İsteğe bağlı efektler (renk değişimi, ses efekti, vb.)
+              // apply effects
               this.applyEffects();
-    
-              return; // Çarpışma tespit edildiğinde erken çıkış yap
+              return; // we exit the function
             }
           }
         }
@@ -60,7 +55,6 @@ class PolygonBall {
             particleSystem.createParticles(this.position.x, this.position.y);
           }
         }
-      
     }
 
     isInGap(angle) {
@@ -93,7 +87,7 @@ class PolygonBall {
             ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) {
           return true;
         }
-    
+                                                     
         if (d1 === 0 && this.onSegment(p3, p4, p1)) return true;
         if (d2 === 0 && this.onSegment(p3, p4, p2)) return true;
         if (d3 === 0 && this.onSegment(p1, p2, p3)) return true;
@@ -112,14 +106,13 @@ class PolygonBall {
       }
     
       separateFromFrame(collisionNormal) {
-        // Topu çerçeveden ayırmak için pozisyonunu değiştir
         let penetrationDepth = this.radius;
         let separationVector = p5.Vector.mult(collisionNormal, penetrationDepth);
         this.position.add(separationVector);
       }
     
       bounceBack(collisionNormal) {
-        // Hız vektörünü çarpışma normali boyunca yansıt
+
         let dotProduct = this.velocity.dot(collisionNormal);
         this.velocity.sub(p5.Vector.mult(collisionNormal, 2 * dotProduct));
       }

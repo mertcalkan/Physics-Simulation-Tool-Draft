@@ -1,4 +1,4 @@
-let bgColor = ""
+let bgColor = "black" // your bgColor here 
 let objectTypes = ["ball", "border"]
 let ballTypes = ["polygon", "circle", "star"]
 let borderSubTypes = ["polygon", "circle"]
@@ -9,7 +9,7 @@ let currentBalls
 let circleBalls
 
 function setup() {
-
+    createCanvas(1920, 1080);
 }
 
 function draw() {
@@ -19,13 +19,33 @@ function draw() {
     // scale things before display and when we will record , the sketch will be display as original rate(1)
     // initing currentBorders and setting up 
 
+
+    objects.push(new CircularBorder({
+        xPos: width / 2,
+        yPos: height / 2,
+        moveable: false,
+        fillable: true,
+        strokeable: true,
+        radius: 500,
+        strokeColor: "white",
+        subType: "Circle",
+    }))
+
+    objects.push(new circleBall({
+        xPos: 500,
+        yPos: 500,
+        radius: 50,
+        collideWithOtherBalls: true,
+        type : "Border",
+        subType: "Circle"
+    }, ))
+
+    let currentBorders = objects.filter(obj => obj.type === "Border");
+    let currentBalls = objects.filter(obj => obj.type === "Ball");
     for (let border of currentBorders) {
         border.display();
 
     }
-    let currentBorders = objects.filter(obj => obj.type === "Border");
-    let currentBalls = objects.filter(obj => obj.type === "Ball");
-
     currentBalls.forEach(ball => {
         currentBorders.forEach(border => {
             if (border.subType === "Polygonal") {
@@ -43,25 +63,7 @@ function draw() {
     });
 
     checkCollisionWithOtherBalls();
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function checkNameDifferences(new_uName, allObj) {
     for (let obj of allObj) {
@@ -71,44 +73,6 @@ function checkNameDifferences(new_uName, allObj) {
     }
     return true;
 }
-
-function radiusDifferencesBetweenSameBorders(newRadius, ) {
-    for (let obj of allObj) {
-        if (obj.uName === new_uName) {
-            return false;
-        }
-    }
-    return true;
-}
-
-
-
-
-
-function deleteSimulation() {
-
-}
-
-function saveSimulation(key, objArr) {
-    const jsonString = JSON.stringify(objArr);
-    localStorage.setItem(key, jsonString);
-}
-
-function openSavedSimulation(key) {
-    const jsonString = localStorage.getItem(key);
-    return JSON.parse(jsonString);
-}
-
-
-function detectObject() {
-
-}
-
-
-function selectRandomFromArray(number, arr) {
-
-}
-
 
 function objectExists(objType, objSubType, allObj) {
     for (let obj of allObj) {
@@ -121,7 +85,6 @@ function objectExists(objType, objSubType, allObj) {
 
 function checkCollisionWithOtherBalls() {
     const allBalls = objects.filter(obj => obj.type === "Ball");
-
     if (allBalls.length > 1) {
         for (let i = 0; i < allBalls.length; i++) {
             for (let j = i + 1; j < allBalls.length; j++) {
@@ -147,13 +110,17 @@ function handleCollision(ball1, ball2) {
     }
 }
 
-function isSameSubtype(ball1, ball2, subtype) {
-    return ball1.subType === subtype && ball2.subType === subtype;
+function isSameSubtype(obj1, obj2, subtype) {
+    return obj1.subType === subtype && obj2.subType === subtype;
+}
+
+function isSameType(obj1, obj2, type) {
+    return obj1.type === type && obj2.type === type;
 }
 
 function isDifferentSubtype(ball1, ball2, subtype1, subtype2) {
-    return (ball1.subType === subtype1 && ball2.subType === subtype2) || 
-           (ball1.subType === subtype2 && ball2.subType === subtype1);
+    return (ball1.subType === subtype1 && ball2.subType === subtype2) ||
+        (ball1.subType === subtype2 && ball2.subType === subtype1);
 }
 
 function handleSimpleCollision(ball1, ball2) {
@@ -180,7 +147,7 @@ function handleStarCollision(star1, star2) {
 }
 
 function handleStarCircleCollision(star, circle) {
-    if (circle.subType === "Star") [star, circle] = [circle, star];
+    if (circle.subType === "Star")[star, circle] = [circle, star];
     let distance = dist(star.position.x, star.position.y, circle.xPos, circle.yPos);
     if (distance < star.radius + circle.radius) {
         handleCollisionReaction(star, circle);
@@ -190,7 +157,7 @@ function handleStarCircleCollision(star, circle) {
 }
 
 function handleCirclePolygonCollision(circle, polygon) {
-    if (polygon.subType === "Circle") [circle, polygon] = [polygon, circle];
+    if (polygon.subType === "Circle")[circle, polygon] = [polygon, circle];
     for (let n = 0; n < polygon.vertices.length; n++) {
         let nextIndex = (n + 1) % polygon.vertices.length;
         let start = polygon.vertices[n];
@@ -198,13 +165,15 @@ function handleCirclePolygonCollision(circle, polygon) {
         let closestPoint = circle.getClosestPointOnLine(start, end);
         let distance = p5.Vector.dist(createVector(circle.xPos, circle.yPos), closestPoint);
         if (distance < circle.radius) {
-            handleCollisionReaction(circle, { position: closestPoint });
+            handleCollisionReaction(circle, {
+                position: closestPoint
+            });
         }
     }
 }
 
 function handlePolygonStarCollision(polygon, star) {
-    if (star.subType === "Polygon") [polygon, star] = [star, polygon];
+    if (star.subType === "Polygon")[polygon, star] = [star, polygon];
     for (let n = 0; n < polygon.vertices.length; n++) {
         let nextIndex = (n + 1) % polygon.vertices.length;
         let start = polygon.vertices[n];
@@ -212,7 +181,9 @@ function handlePolygonStarCollision(polygon, star) {
         let closestPoint = star.getClosestPointOnLine(start, end);
         let distance = p5.Vector.dist(star.position, closestPoint);
         if (distance < star.radius) {
-            handleCollisionReaction(star, { position: closestPoint });
+            handleCollisionReaction(star, {
+                position: closestPoint
+            });
         }
     }
 }

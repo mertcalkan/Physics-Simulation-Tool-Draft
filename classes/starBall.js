@@ -47,8 +47,8 @@ class StarBall {
     let distToLine = p5.Vector.dist(this.position, closestPoint);
 
     if (distToLine < this.radius) {
-      let collisionNormal = p5.Vector.sub(this.position, closestPoint).normalize();
-      this.handleCollision(collisionNormal);
+      let linearCollisionNormal = p5.Vector.sub(this.position, closestPoint).normalize();
+      this.handleCollision(linearCollisionNormal);
 
       let penetrationDepth = this.radius - distToLine;
       this.position.add(p5.Vector.mult(collisionNormal, penetrationDepth));

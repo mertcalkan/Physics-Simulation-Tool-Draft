@@ -4,13 +4,11 @@ class CircleBall {
     this.position = createVector(params.xPos, params.yPos);
     this.velocity = createVector(params.xSpeed, params.ySpeed);
     this.collideWithOtherBalls = ballNumber > 1 && params.collideWithOtherBalls;
-    this.spinnable = params.spinnable;  // Fixed assignment operator
+    this.spinnable = params.spinnable;
   }
 
   applyGravity(gravity) {
-    if (this.gravityActive()) {
       this.velocity.y += gravity;
-    }
   }
 
   update() {
@@ -228,7 +226,7 @@ class CircleBall {
             ...this,
             startAngle: borderType === "Maze" ? this.startAngle : 0,
             endAngle: borderType === "Maze" ? this.endAngle : 360,
-            spinAroundItself: borderType === "Maze"
+            spinAroundItself: borderType === "Maze" ? this.spinAroundItself : false
         });
     } else if (borderSubType === "Polygon") {
         // Handle Polygon borders
@@ -260,14 +258,11 @@ _removeBorders(removeBorderProp) {
   if (removeBorderProp.reference === "random") {
       const borderObjects = objects.filter(obj => obj.type === "Border");
       if (borderObjects.length >= removeBorderProp.borderCount) {
-          // Randomly select borders to remove
           const bordersToRemove = Math.floor(Math.random() * removeBorderProp.borderCount) + 1;
           for (let i = 0; i < bordersToRemove; i++) {
               const randomIndex = Math.floor(Math.random() * borderObjects.length);
               const borderToRemove = borderObjects[randomIndex]
-              // Remove the selected border from objects
               objects = objects.filter(obj => obj !== borderToRemove);
-              // Remove the border from the filtered list
               borderObjects.splice(randomIndex, 1);
           }
       }
